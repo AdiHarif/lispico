@@ -13,7 +13,8 @@ atom = _{
 }
 
 identifier = @{
-    ASCII_ALPHA+
+      (ASCII_ALPHA | "_" | "-" )+
+    | ("." | "<" | ">" | "$" | "@" | "_" | "!" | "=" | "'")+
 }
 
 exp = _{

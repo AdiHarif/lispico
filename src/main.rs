@@ -151,4 +151,26 @@ mod tests {
             assert_eq!(sexp, expected, "program: {}", program);
         }
     }
+
+    #[test]
+    fn test_parse_identifier() {
+        let identifiers = vec![
+            "a", "aa", ".", ".<", ".>", "$", "@", "<<", ">>", "=", "_a", "a_", "a_a-a_", "'",
+        ];
+
+        for identifier in identifiers {
+            let pairs = MylispParser::parse(Rule::identifier, identifier);
+            assert!(
+                pairs.is_ok() && pairs.unwrap().len() == 1,
+                "identifier: {}",
+                identifier
+            );
+        }
+
+        let invalid_identifiers = vec!["", "(", "[", "'", "\"", " "];
+        for identifier in invalid_identifiers {
+            let pairs = MylispParser::parse(Rule::identifier, identifier);
+            assert!(pairs.is_err(), "identifier: {}", identifier);
+        }
+    }
 }

@@ -28,6 +28,13 @@ fn construct_sexp(pair: Pair<Rule>) -> Sexp {
                 Box::new(construct_sexp(seq.next().unwrap())),
             )
         }
+        Rule::quote_exp => Sexp::Cons(
+            Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
+            Box::new(Sexp::Cons(
+                Box::new(construct_sexp(pair.into_inner().next().unwrap())),
+                Box::new(Sexp::Atom(Atom::Nil)),
+            )),
+        ),
         _ => unreachable!("unexpected rule: {:?}", pair.as_rule()),
     }
 }
@@ -49,12 +56,16 @@ mod tests {
             "((a))",
             "(a (b))",
             "(a (b c))",
+            "('a)",
+            "('a 'b)",
+            "(a 'b c)",
+            "( a )",
         ];
         for program in programs {
             assert!(MylispParser::parse(Rule::program, program).is_ok());
         }
 
-        let faulty_programs = vec!["(", ")", "(a", "a)", "(a b", "(a b c"];
+        let faulty_programs = vec!["(", ")", "(a", "a)", "(a b", "(a b c", "(' a)"];
         for program in faulty_programs {
             assert!(MylispParser::parse(Rule::program, program).is_err());
         }
@@ -140,6 +151,67 @@ mod tests {
                     )),
                 ),
             ),
+            (
+                "('a)",
+                Sexp::Cons(
+                    Box::new(Sexp::Cons(
+                        Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
+                        Box::new(Sexp::Cons(
+                            Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
+                            Box::new(Sexp::Atom(Atom::Nil)),
+                        )),
+                    )),
+                    Box::new(Sexp::Atom(Atom::Nil)),
+                ),
+            ),
+            (
+                "('a 'b)",
+                Sexp::Cons(
+                    Box::new(Sexp::Cons(
+                        Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
+                        Box::new(Sexp::Cons(
+                            Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
+                            Box::new(Sexp::Atom(Atom::Nil)),
+                        )),
+                    )),
+                    Box::new(Sexp::Cons(
+                        Box::new(Sexp::Cons(
+                            Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
+                            Box::new(Sexp::Cons(
+                                Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
+                                Box::new(Sexp::Atom(Atom::Nil)),
+                            )),
+                        )),
+                        Box::new(Sexp::Atom(Atom::Nil)),
+                    )),
+                ),
+            ),
+            (
+                "(a 'b c)",
+                Sexp::Cons(
+                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
+                    Box::new(Sexp::Cons(
+                        Box::new(Sexp::Cons(
+                            Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
+                            Box::new(Sexp::Cons(
+                                Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
+                                Box::new(Sexp::Atom(Atom::Nil)),
+                            )),
+                        )),
+                        Box::new(Sexp::Cons(
+                            Box::new(Sexp::Atom(Atom::Identifier("c".to_string()))),
+                            Box::new(Sexp::Atom(Atom::Nil)),
+                        )),
+                    )),
+                ),
+            ),
+            (
+                "( a )",
+                Sexp::Cons(
+                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
+                    Box::new(Sexp::Atom(Atom::Nil)),
+                ),
+            ),
         ];
 
         for (program, expected) in programs {
@@ -155,7 +227,7 @@ mod tests {
     #[test]
     fn test_parse_identifier() {
         let identifiers = vec![
-            "a", "aa", ".", ".<", ".>", "$", "@", "<<", ">>", "=", "_a", "a_", "a_a-a_", "'",
+            "a", "aa", ".", ".<", ".>", "$", "@", "<<", ">>", "=", "_a", "a_", "a_a-a_",
         ];
 
         for identifier in identifiers {
@@ -167,7 +239,7 @@ mod tests {
             );
         }
 
-        let invalid_identifiers = vec!["", "(", "[", "'", "\"", " "];
+        let invalid_identifiers = vec!["", "(", "[", "\"", " ", "'"];
         for identifier in invalid_identifiers {
             let pairs = MylispParser::parse(Rule::identifier, identifier);
             assert!(pairs.is_err(), "identifier: {}", identifier);

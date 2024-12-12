@@ -14,15 +14,19 @@ atom = _{
 
 identifier = @{
       (ASCII_ALPHA | "_" | "-" )+
-    | ("." | "<" | ">" | "$" | "@" | "_" | "!" | "=" | "'")+
+    | ("." | "<" | ">" | "$" | "@" | "_" | "!" | "=")+
+}
+
+quote_exp = ${
+    "'" ~ exp
 }
 
 exp = _{
     atom | list
 }
 
-seq = {
-    exp ~ (seq | nil)
+seq = !{
+    (exp | quote_exp) ~ (seq | nil)
 }
 
 list = _{

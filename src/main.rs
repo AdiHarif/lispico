@@ -2,8 +2,8 @@ use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
 
 #[derive(Parser)]
-#[grammar = "mylisp.pest"]
-struct MylispParser;
+#[grammar = "lispico.pest"]
+struct LispicoParser;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -117,12 +117,12 @@ mod tests {
             "( a )",
         ];
         for program in programs {
-            assert!(MylispParser::parse(Rule::program, program).is_ok());
+            assert!(LispicoParser::parse(Rule::program, program).is_ok());
         }
 
         let faulty_programs = vec!["(", ")", "(a", "a)", "(a b", "(a b c", "(' a)"];
         for program in faulty_programs {
-            assert!(MylispParser::parse(Rule::program, program).is_err());
+            assert!(LispicoParser::parse(Rule::program, program).is_err());
         }
     }
 
@@ -270,7 +270,7 @@ mod tests {
         ];
 
         for (program, expected) in programs {
-            let pairs = MylispParser::parse(Rule::list, program)
+            let pairs = LispicoParser::parse(Rule::list, program)
                 .unwrap()
                 .next()
                 .unwrap();
@@ -286,7 +286,7 @@ mod tests {
         ];
 
         for identifier in identifiers {
-            let pairs = MylispParser::parse(Rule::identifier, identifier);
+            let pairs = LispicoParser::parse(Rule::identifier, identifier);
             assert!(
                 pairs.is_ok() && pairs.unwrap().len() == 1,
                 "identifier: {}",
@@ -296,7 +296,7 @@ mod tests {
 
         let invalid_identifiers = vec!["", "(", "[", "\"", " ", "'"];
         for identifier in invalid_identifiers {
-            let pairs = MylispParser::parse(Rule::identifier, identifier);
+            let pairs = LispicoParser::parse(Rule::identifier, identifier);
             assert!(pairs.is_err(), "identifier: {}", identifier);
         }
     }
@@ -323,7 +323,7 @@ mod tests {
         ];
 
         for (program, expected) in programs {
-            let pairs = MylispParser::parse(Rule::list, program)
+            let pairs = LispicoParser::parse(Rule::list, program)
                 .unwrap()
                 .next()
                 .unwrap();

@@ -212,10 +212,13 @@ mod tests {
         let programs = vec![
             ("()", Sexp::Atom(Atom::Nil)),
             (
-                "(. 'a 'b)",
+                "(. 'a '(b))",
                 Sexp::Cons(
                     Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
+                    Box::new(Sexp::Cons(
+                        Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
+                        Box::new(Sexp::Atom(Atom::Nil)),
+                    )),
                 ),
             ),
             ("(.< '(a b))", Sexp::Atom(Atom::Identifier("a".to_string()))),
@@ -223,6 +226,13 @@ mod tests {
                 "(.> '(a b))",
                 Sexp::Cons(
                     Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
+                    Box::new(Sexp::Atom(Atom::Nil)),
+                ),
+            ),
+            (
+                "(. 'a ())",
+                Sexp::Cons(
+                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(Sexp::Atom(Atom::Nil)),
                 ),
             ),

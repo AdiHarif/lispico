@@ -51,10 +51,13 @@ impl Sexp {
 fn eval_function(operator: Sexp, args: Sexp) -> Sexp {
     match operator {
         Sexp::Atom(Atom::Identifier(identifier)) => match identifier.as_str() {
-            "." => Sexp::Cons(
-                Box::new(args.car().clone().eval()),
-                Box::new(args.cdr().car().clone().eval()),
-            ),
+            "." => {
+                let tl = args.cdr().car().clone().eval();
+                if let Sexp::Atom(Atom::Nil) | Sexp::Cons(_, _) = tl {
+                    return Sexp::Cons(Box::new(args.car().clone().eval()), Box::new(tl));
+                }
+                panic!("Expected a list, but got an atom");
+            }
             ".<" => args.car().clone().eval().car().clone(),
             ".>" => args.car().clone().eval().cdr().clone(),
             "'" => args.car().clone(),

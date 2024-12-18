@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum List {
     Nil,
@@ -29,6 +31,20 @@ impl List {
     }
 }
 
+impl Display for List {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            List::Nil => write!(f, ""),
+            List::Cons(hd, tl) if matches!(**tl, List::Nil) => {
+                write!(f, "{}", hd)
+            }
+            List::Cons(hd, tl) => {
+                write!(f, "{} {}", hd, tl)
+            }
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Exp {
     Identifier(String),
@@ -40,6 +56,19 @@ impl Exp {
         match self {
             Exp::Identifier(_) => Exp::List(List::Nil),
             Exp::List(list) => list.eval(),
+        }
+    }
+}
+
+impl Display for Exp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Exp::Identifier(identifier) => write!(f, "{}", identifier),
+            Exp::List(List::Cons(hd, tl)) if matches!(**hd, Exp::Identifier(ref id) if id == "'") =>
+            {
+                write!(f, "'{}", tl)
+            }
+            Exp::List(list) => write!(f, "({})", list),
         }
     }
 }

@@ -247,4 +247,145 @@ mod tests {
             assert_eq!(exp.eval(), expected, "program: {}", program);
         }
     }
+
+    #[test]
+    fn test_display() {
+        let programs = vec![
+            (
+                "(a)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Nil),
+                )),
+            ),
+            (
+                "(a b)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+            (
+                "(a b c)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(List::Nil),
+                        )),
+                    )),
+                )),
+            ),
+            ("()", Exp::List(List::Nil)),
+            (
+                "(())",
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Nil)),
+                    Box::new(List::Nil),
+                )),
+            ),
+            (
+                "((a))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(List::Nil),
+                    ))),
+                    Box::new(List::Nil),
+                )),
+            ),
+            (
+                "(a (b))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(List::Nil),
+                        ))),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+            (
+                "(a (b c))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("c".to_string())),
+                                Box::new(List::Nil),
+                            )),
+                        ))),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+            (
+                "('a)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(List::Nil),
+                        )),
+                    ))),
+                    Box::new(List::Nil),
+                )),
+            ),
+            (
+                "('a 'b)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(List::Nil),
+                        )),
+                    ))),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(List::Nil),
+                            )),
+                        ))),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+            (
+                "(a 'b c)",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(List::Nil),
+                            )),
+                        ))),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(List::Nil),
+                        )),
+                    )),
+                )),
+            ),
+        ];
+
+        for (program, exp) in programs {
+            assert_eq!(program, exp.to_string(), "program: {}", program);
+        }
+    }
 }

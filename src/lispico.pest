@@ -22,15 +22,15 @@ quote_exp = ${
 }
 
 exp = _{
-    atom | list
+    atom | paren_list
 }
 
-seq = !{
-    (exp | quote_exp) ~ (seq | nil)
+list = !{
+    (exp | quote_exp) ~ (list | nil)
 }
 
-list = _{
-      rparen ~ (seq | nil) ~ lparen
+paren_list = _{
+      rparen ~ (list | nil) ~ lparen
 }
 
 silent_eoi = _{
@@ -38,5 +38,5 @@ silent_eoi = _{
 }
 
 program = _{
-    SOI ~ list ~ silent_eoi
+    SOI ~ paren_list ~ silent_eoi
 }

@@ -3,8 +3,8 @@ mod tests {
     use pest::Parser;
 
     use crate::*;
+    use exp::*;
     use parser::*;
-    use sexp::*;
 
     #[test]
     fn test_parser() {
@@ -33,155 +33,155 @@ mod tests {
     }
 
     #[test]
-    fn test_sexp() {
+    fn test_exp() {
         let programs = vec![
             (
                 "(a)",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Nil),
+                )),
             ),
             (
                 "(a b)",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                        Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Nil),
                     )),
-                ),
+                )),
             ),
             (
                 "(a b c)",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("c".to_string()))),
-                            Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(List::Nil),
                         )),
                     )),
-                ),
+                )),
             ),
-            ("()", Sexp::Atom(Atom::Nil)),
+            ("()", Exp::List(List::Nil)),
             (
                 "(())",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Nil)),
+                    Box::new(List::Nil),
+                )),
             ),
             (
                 "((a))",
-                Sexp::Cons(
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                        Box::new(Sexp::Atom(Atom::Nil)),
-                    )),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(List::Nil),
+                    ))),
+                    Box::new(List::Nil),
+                )),
             ),
             (
                 "(a (b))",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                            Box::new(Sexp::Atom(Atom::Nil)),
-                        )),
-                        Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(List::Nil),
+                        ))),
+                        Box::new(List::Nil),
                     )),
-                ),
+                )),
             ),
             (
                 "(a (b c))",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                            Box::new(Sexp::Cons(
-                                Box::new(Sexp::Atom(Atom::Identifier("c".to_string()))),
-                                Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("c".to_string())),
+                                Box::new(List::Nil),
                             )),
-                        )),
-                        Box::new(Sexp::Atom(Atom::Nil)),
+                        ))),
+                        Box::new(List::Nil),
                     )),
-                ),
+                )),
             ),
             (
                 "('a)",
-                Sexp::Cons(
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                            Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(List::Nil),
                         )),
-                    )),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                    ))),
+                    Box::new(List::Nil),
+                )),
             ),
             (
                 "('a 'b)",
-                Sexp::Cons(
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                            Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::List(List::Cons(
+                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(List::Nil),
                         )),
-                    )),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
-                            Box::new(Sexp::Cons(
-                                Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                                Box::new(Sexp::Atom(Atom::Nil)),
+                    ))),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(List::Nil),
                             )),
-                        )),
-                        Box::new(Sexp::Atom(Atom::Nil)),
+                        ))),
+                        Box::new(List::Nil),
                     )),
-                ),
+                )),
             ),
             (
                 "(a 'b c)",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("'".to_string()))),
-                            Box::new(Sexp::Cons(
-                                Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                                Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::List(List::Cons(
+                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(List::Cons(
+                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(List::Nil),
                             )),
-                        )),
-                        Box::new(Sexp::Cons(
-                            Box::new(Sexp::Atom(Atom::Identifier("c".to_string()))),
-                            Box::new(Sexp::Atom(Atom::Nil)),
+                        ))),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(List::Nil),
                         )),
                     )),
-                ),
+                )),
             ),
             (
                 "( a )",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Nil),
+                )),
             ),
         ];
 
         for (program, expected) in programs {
-            let pairs = LispicoParser::parse(Rule::list, program)
+            let pairs = LispicoParser::parse(Rule::program, program)
                 .unwrap()
                 .next()
                 .unwrap();
-            let sexp = construct_sexp(pairs);
-            assert_eq!(sexp, expected, "program: {}", program);
+            let exp = construct_exp(pairs);
+            assert_eq!(exp, expected, "program: {}", program);
         }
     }
 
@@ -210,41 +210,41 @@ mod tests {
     #[test]
     fn test_eval() {
         let programs = vec![
-            ("()", Sexp::Atom(Atom::Nil)),
+            ("()", Exp::List(List::Nil)),
             (
                 "(. 'a '(b))",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Cons(
-                        Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                        Box::new(Sexp::Atom(Atom::Nil)),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Nil),
                     )),
-                ),
+                )),
             ),
-            ("(.< '(a b))", Sexp::Atom(Atom::Identifier("a".to_string()))),
+            ("(.< '(a b))", Exp::Identifier("a".to_string())),
             (
                 "(.> '(a b))",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("b".to_string()))),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("b".to_string())),
+                    Box::new(List::Nil),
+                )),
             ),
             (
                 "(. 'a ())",
-                Sexp::Cons(
-                    Box::new(Sexp::Atom(Atom::Identifier("a".to_string()))),
-                    Box::new(Sexp::Atom(Atom::Nil)),
-                ),
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Nil),
+                )),
             ),
         ];
 
         for (program, expected) in programs {
-            let pairs = LispicoParser::parse(Rule::list, program)
+            let pairs = LispicoParser::parse(Rule::program, program)
                 .unwrap()
                 .next()
                 .unwrap();
-            let sexp = construct_sexp(pairs);
-            assert_eq!(sexp.eval(), expected, "program: {}", program);
+            let exp = construct_exp(pairs);
+            assert_eq!(exp.eval(), expected, "program: {}", program);
         }
     }
 }

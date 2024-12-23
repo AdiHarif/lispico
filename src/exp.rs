@@ -21,10 +21,10 @@ impl List {
         }
     }
 
-    pub fn eval(&self) -> Exp {
+    pub fn eval(&self, env: List) -> (Exp, List) {
         match self {
-            List::Nil => Exp::List(List::Nil),
-            List::Cons(hd, tl) => eval_function(hd, tl),
+            List::Nil => (Exp::List(List::Nil), env),
+            List::Cons(hd, tl) => eval_function(hd, tl, env),
         }
     }
 }
@@ -50,10 +50,10 @@ pub enum Exp {
 }
 
 impl Exp {
-    pub fn eval(&self) -> Exp {
+    pub fn eval(&self, env: List) -> (Exp, List) {
         match self {
-            Exp::Identifier(_) => Exp::List(List::Nil),
-            Exp::List(list) => list.eval(),
+            Exp::Identifier(_) => (Exp::List(List::Nil), env),
+            Exp::List(list) => list.eval(env),
         }
     }
 }
@@ -71,40 +71,43 @@ impl Display for Exp {
     }
 }
 
-fn eval_function(operator: &Exp, args: &List) -> Exp {
+fn eval_function(operator: &Exp, args: &List, env: List) -> (Exp, List) {
     match operator {
         Exp::Identifier(identifier) => match identifier.as_str() {
             "." => {
-                let new_hd = args.hd().eval();
-                let new_tl = args.tl().hd().eval();
+                let (new_hd, new_env) = args.hd().eval(env);
+                let (new_tl, new_env) = args.tl().hd().eval(new_env);
                 if let Exp::List(list) = new_tl {
-                    return Exp::List(List::Cons(Box::new(new_hd), Box::new(list)));
+                    return (
+                        Exp::List(List::Cons(Box::new(new_hd), Box::new(list))),
+                        new_env,
+                    );
                 }
                 panic!("Expected a list, but got an atom");
             }
             ".<" => {
-                let arg = args.hd().eval();
+                let (arg, new_env) = args.hd().eval(env);
                 if let Exp::List(list) = arg {
-                    return list.hd().clone();
+                    return (list.hd().clone(), new_env);
                 }
                 panic!("Expected a list, but got an atom");
             }
             ".>" => {
-                let arg = args.hd().eval();
+                let (arg, new_env) = args.hd().eval(env);
                 if let Exp::List(list) = arg {
-                    return Exp::List(list.tl().clone());
+                    return (Exp::List(list.tl().clone()), new_env);
                 }
                 panic!("Expected a list, but got an atom");
             }
-            "'" => args.hd().clone(),
+            "'" => (args.hd().clone(), env),
             "?" => {
-                let cond = args.hd().eval();
+                let (cond, new_env) = args.hd().eval(env);
                 match cond {
                     Exp::List(List::Nil) if matches!(args.tl().tl(), List::Nil) => {
-                        Exp::List(List::Nil)
+                        (Exp::List(List::Nil), new_env)
                     }
-                    Exp::List(List::Nil) => args.tl().tl().hd().eval(),
-                    _ => args.tl().hd().eval(),
+                    Exp::List(List::Nil) => args.tl().tl().hd().eval(new_env),
+                    _ => args.tl().hd().eval(new_env),
                 }
             }
             _ => panic!("Unknown operator: {}", identifier),

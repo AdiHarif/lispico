@@ -7,6 +7,8 @@ mod exp;
 mod parser;
 mod tests;
 
+use exp::List;
+
 fn main() -> io::Result<()> {
     loop {
         print!("$ ");
@@ -23,6 +25,7 @@ fn main() -> io::Result<()> {
             .unwrap();
 
         let exp = parser::construct_exp(pair);
-        println!("{}", exp.eval());
+        let (res, _) = exp.eval(List::Nil);
+        println!("{}", res);
     }
 }

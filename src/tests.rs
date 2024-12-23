@@ -250,7 +250,8 @@ mod tests {
                 .next()
                 .unwrap();
             let exp = construct_exp(pairs);
-            assert_eq!(exp.eval(), expected, "program: {}", program);
+            let (res, _) = exp.eval(List::Nil);
+            assert_eq!(res, expected, "program: {}", program);
         }
     }
 

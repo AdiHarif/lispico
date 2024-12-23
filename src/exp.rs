@@ -24,9 +24,7 @@ impl List {
     pub fn eval(&self) -> Exp {
         match self {
             List::Nil => Exp::List(List::Nil),
-            List::Cons(hd, tl) => {
-                return eval_function(*hd.clone(), *tl.clone());
-            }
+            List::Cons(hd, tl) => eval_function(hd, tl),
         }
     }
 }
@@ -52,7 +50,7 @@ pub enum Exp {
 }
 
 impl Exp {
-    pub fn eval(self) -> Exp {
+    pub fn eval(&self) -> Exp {
         match self {
             Exp::Identifier(_) => Exp::List(List::Nil),
             Exp::List(list) => list.eval(),
@@ -73,26 +71,26 @@ impl Display for Exp {
     }
 }
 
-fn eval_function(operator: Exp, args: List) -> Exp {
+fn eval_function(operator: &Exp, args: &List) -> Exp {
     match operator {
         Exp::Identifier(identifier) => match identifier.as_str() {
             "." => {
-                let new_hd = args.hd().clone().eval();
-                let new_tl = args.tl().hd().clone().eval();
+                let new_hd = args.hd().eval();
+                let new_tl = args.tl().hd().eval();
                 if let Exp::List(list) = new_tl {
                     return Exp::List(List::Cons(Box::new(new_hd), Box::new(list)));
                 }
                 panic!("Expected a list, but got an atom");
             }
             ".<" => {
-                let arg = args.hd().clone().eval();
+                let arg = args.hd().eval();
                 if let Exp::List(list) = arg {
                     return list.hd().clone();
                 }
                 panic!("Expected a list, but got an atom");
             }
             ".>" => {
-                let arg = args.hd().clone().eval();
+                let arg = args.hd().eval();
                 if let Exp::List(list) = arg {
                     return Exp::List(list.tl().clone());
                 }
@@ -100,13 +98,13 @@ fn eval_function(operator: Exp, args: List) -> Exp {
             }
             "'" => args.hd().clone(),
             "?" => {
-                let cond = args.hd().clone().eval();
+                let cond = args.hd().eval();
                 match cond {
                     Exp::List(List::Nil) if matches!(args.tl().tl(), List::Nil) => {
                         Exp::List(List::Nil)
                     }
-                    Exp::List(List::Nil) => args.tl().tl().hd().clone().eval(),
-                    _ => args.tl().hd().clone().eval(),
+                    Exp::List(List::Nil) => args.tl().tl().hd().eval(),
+                    _ => args.tl().hd().eval(),
                 }
             }
             _ => panic!("Unknown operator: {}", identifier),

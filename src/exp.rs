@@ -99,6 +99,16 @@ fn eval_function(operator: Exp, args: List) -> Exp {
                 panic!("Expected a list, but got an atom");
             }
             "'" => args.hd().clone(),
+            "?" => {
+                let cond = args.hd().clone().eval();
+                match cond {
+                    Exp::List(List::Nil) if matches!(args.tl().tl(), List::Nil) => {
+                        Exp::List(List::Nil)
+                    }
+                    Exp::List(List::Nil) => args.tl().tl().hd().clone().eval(),
+                    _ => args.tl().hd().clone().eval(),
+                }
+            }
             _ => panic!("Unknown operator: {}", identifier),
         },
         _ => panic!("Expected an identifier, but got a list"),

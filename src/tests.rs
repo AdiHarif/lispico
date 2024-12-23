@@ -21,6 +21,8 @@ mod tests {
             "('a 'b)",
             "(a 'b c)",
             "( a )",
+            "(? 't 'a 'b)",
+            "(? 't 'a)",
         ];
         for program in programs {
             assert!(LispicoParser::parse(Rule::program, program).is_ok());
@@ -236,6 +238,10 @@ mod tests {
                     Box::new(List::Nil),
                 )),
             ),
+            ("(? 't 'a 'b)", Exp::Identifier("a".to_string())),
+            ("(? () 'a 'b)", Exp::Identifier("b".to_string())),
+            ("(? 't 'a)", Exp::Identifier("a".to_string())),
+            ("(? () 'a)", Exp::List(List::Nil)),
         ];
 
         for (program, expected) in programs {

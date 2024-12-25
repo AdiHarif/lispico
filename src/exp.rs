@@ -160,6 +160,19 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> (Exp, List) {
                     _ => args.tl().hd().eval(new_env),
                 }
             }
+            ":=" => {
+                let name = args.hd();
+                if let Exp::List(_) = name {
+                    panic!("Expected an identifier, but got a list");
+                }
+                let (value, new_env) = args.tl().hd().eval(env);
+                let new_binding = List::Cons(
+                    Box::new(Exp::Identifier(name.to_string())),
+                    Box::new(List::Cons(Box::new(value), Box::new(List::Nil))),
+                );
+                let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));
+                (Exp::List(List::Nil), new_env)
+            }
             _ => panic!("Unknown operator: {}", identifier),
         },
         _ => panic!("Expected an identifier, but got a list"),

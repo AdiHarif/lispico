@@ -10,6 +10,7 @@ mod tests;
 use exp::List;
 
 fn main() -> io::Result<()> {
+    let mut env = List::Nil;
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -25,7 +26,8 @@ fn main() -> io::Result<()> {
             .unwrap();
 
         let exp = parser::construct_exp(pair);
-        let (res, _) = exp.eval(List::Nil);
+        let (res, new_env) = exp.eval(env);
+        env = new_env;
         println!("{}", res);
     }
 }

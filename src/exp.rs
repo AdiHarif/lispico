@@ -49,10 +49,60 @@ pub enum Exp {
     List(List),
 }
 
+fn env_lookup(identifier: &str, env: &List) -> Exp {
+    match env {
+        List::Nil => Exp::List(List::Nil),
+        List::Cons(hd, tl) => match **hd {
+            Exp::List(List::Cons(ref name, ref value_list)) if matches!(**name, Exp::Identifier(ref id) if id == identifier) =>
+            {
+                return value_list.hd().clone();
+            }
+            _ => env_lookup(identifier, tl),
+        },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser::construct_exp;
+    use crate::parser::LispicoParser;
+    use crate::parser::Rule;
+    use pest::Parser;
+
+    #[test]
+    fn test_lookup() {
+        let envs = vec![
+            ("()", "a", Exp::List(List::Nil)),
+            ("((a x))", "a", Exp::Identifier("x".to_string())),
+            ("((a x) (b y))", "a", Exp::Identifier("x".to_string())),
+            ("((a x) (b y))", "b", Exp::Identifier("y".to_string())),
+            ("((a x) (b y))", "", Exp::List(List::Nil)),
+        ];
+
+        for (env_str, identifier, expected) in envs {
+            let pair = LispicoParser::parse(Rule::program, env_str)
+                .unwrap()
+                .next()
+                .unwrap();
+            let env_exp = construct_exp(pair);
+            let env;
+            if let Exp::List(list) = env_exp {
+                env = list;
+            } else {
+                panic!("Expected a list, but got an atom");
+            }
+
+            let res = env_lookup(identifier, &env);
+            assert_eq!(res, expected, "env: {}", env_str);
+        }
+    }
+}
+
 impl Exp {
     pub fn eval(&self, env: List) -> (Exp, List) {
         match self {
-            Exp::Identifier(_) => (Exp::List(List::Nil), env),
+            Exp::Identifier(id) => (env_lookup(id, &env), env),
             Exp::List(list) => list.eval(env),
         }
     }

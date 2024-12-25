@@ -20,6 +20,11 @@ fn main() -> io::Result<()> {
             return Ok(());
         }
 
+        input = input.trim().to_string();
+        if input.is_empty() {
+            continue;
+        }
+
         let pair = LispicoParser::parse(parser::Rule::program, &input)
             .expect("failed to parse input")
             .next()

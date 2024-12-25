@@ -7,7 +7,7 @@ mod exp;
 mod parser;
 mod tests;
 
-use exp::List;
+use exp::{Exp, List};
 
 fn main() -> io::Result<()> {
     let mut env = List::Nil;
@@ -33,6 +33,10 @@ fn main() -> io::Result<()> {
         let exp = parser::construct_exp(pair);
         let (res, new_env) = exp.eval(env);
         env = new_env;
+
+        if let Exp::List(List::Nil) = res {
+            continue;
+        }
         println!("{}", res);
     }
 }

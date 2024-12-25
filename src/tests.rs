@@ -395,4 +395,63 @@ mod tests {
             assert_eq!(program, exp.to_string(), "program: {}", program);
         }
     }
+
+    #[test]
+    fn test_env() {
+        let cases = vec![
+            ("(? a 'b 'c)", "((a x))", Exp::Identifier("b".to_string())),
+            ("(? a 'b 'c)", "((b x))", Exp::Identifier("c".to_string())),
+            (
+                "(. a b)",
+                "((a x) (b (y z)))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("x".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("y".to_string())),
+                        Box::new(List::Cons(
+                            Box::new(Exp::Identifier("z".to_string())),
+                            Box::new(List::Nil),
+                        )),
+                    )),
+                )),
+            ),
+            ("(.< a)", "((a (x y z)))", Exp::Identifier("x".to_string())),
+            (
+                "(.> a)",
+                "((a (x y z)))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("y".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("z".to_string())),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+        ];
+
+        for (program_str, env_str, expected) in cases {
+            let program_pair = LispicoParser::parse(Rule::program, program_str)
+                .unwrap()
+                .next()
+                .unwrap();
+            let env_pair = LispicoParser::parse(Rule::program, env_str)
+                .unwrap()
+                .next()
+                .unwrap();
+            let program = construct_exp(program_pair);
+            let env_exp = construct_exp(env_pair);
+            let env;
+            if let Exp::List(list) = env_exp {
+                env = list;
+            } else {
+                panic!("Expected a list, but got an atom");
+            }
+            let (res, _) = program.eval(env);
+            assert_eq!(
+                res, expected,
+                "program: {}, env: {}, res: {}",
+                program_str, env_str, res
+            );
+        }
+    }
 }

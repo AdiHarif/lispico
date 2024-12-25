@@ -38,5 +38,5 @@ silent_eoi = _{
 }
 
 program = _{
-    SOI ~ paren_list ~ silent_eoi
+    SOI ~ exp ~ silent_eoi
 }

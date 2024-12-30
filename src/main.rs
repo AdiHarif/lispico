@@ -37,6 +37,6 @@ fn main() -> io::Result<()> {
         if let Exp::List(List::Nil) = res {
             continue;
         }
-        println!("{}", res);
+        println!("{res}");
     }
 }

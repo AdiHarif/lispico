@@ -34,10 +34,10 @@ impl Display for List {
         match self {
             List::Nil => write!(f, ""),
             List::Cons(hd, tl) if matches!(**tl, List::Nil) => {
-                write!(f, "{}", hd)
+                write!(f, "{hd}")
             }
             List::Cons(hd, tl) => {
-                write!(f, "{} {}", hd, tl)
+                write!(f, "{hd} {tl}")
             }
         }
     }
@@ -94,7 +94,7 @@ mod tests {
             }
 
             let res = env_lookup(identifier, &env);
-            assert_eq!(res, expected, "env: {}", env_str);
+            assert_eq!(res, expected, "env: {env_str}");
         }
     }
 }
@@ -111,12 +111,12 @@ impl Exp {
 impl Display for Exp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Exp::Identifier(identifier) => write!(f, "{}", identifier),
+            Exp::Identifier(identifier) => write!(f, "{identifier}"),
             Exp::List(List::Cons(hd, tl)) if matches!(**hd, Exp::Identifier(ref id) if id == "'") =>
             {
-                write!(f, "'{}", tl)
+                write!(f, "'{tl}")
             }
-            Exp::List(list) => write!(f, "({})", list),
+            Exp::List(list) => write!(f, "({list})"),
         }
     }
 }
@@ -173,7 +173,7 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> (Exp, List) {
                 let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));
                 (Exp::List(List::Nil), new_env)
             }
-            _ => panic!("Unknown operator: {}", identifier),
+            _ => panic!("Unknown operator: {identifier}"),
         },
         _ => panic!("Expected an identifier, but got a list"),
     }

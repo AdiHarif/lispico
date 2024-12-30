@@ -197,15 +197,14 @@ mod tests {
             let pairs = LispicoParser::parse(Rule::identifier, identifier);
             assert!(
                 pairs.is_ok() && pairs.unwrap().len() == 1,
-                "identifier: {}",
-                identifier
+                "identifier: {identifier}"
             );
         }
 
         let invalid_identifiers = vec!["", "(", "[", "\"", " ", "'"];
         for identifier in invalid_identifiers {
             let pairs = LispicoParser::parse(Rule::identifier, identifier);
-            assert!(pairs.is_err(), "identifier: {}", identifier);
+            assert!(pairs.is_err(), "identifier: {identifier}");
         }
     }
 
@@ -251,7 +250,7 @@ mod tests {
                 .unwrap();
             let exp = construct_exp(pairs);
             let (res, _) = exp.eval(List::Nil);
-            assert_eq!(res, expected, "program: {}", program);
+            assert_eq!(res, expected, "program: {program}");
         }
     }
 
@@ -392,7 +391,7 @@ mod tests {
         ];
 
         for (program, exp) in programs {
-            assert_eq!(program, exp.to_string(), "program: {}", program);
+            assert_eq!(program, exp.to_string(), "program: {program}");
         }
     }
 
@@ -449,8 +448,7 @@ mod tests {
             let (res, _) = program.eval(env);
             assert_eq!(
                 res, expected,
-                "program: {}, env: {}, res: {}",
-                program_str, env_str, res
+                "program: {program_str}, env: {env_str}, res: {res}"
             );
         }
     }

@@ -71,7 +71,7 @@ mod tests {
     use pest::Parser;
 
     #[test]
-    fn test_lookup() {
+    fn lookup() {
         let envs = vec![
             ("()", "a", Exp::List(List::Nil)),
             ("((a x))", "a", Exp::Identifier("x".to_string())),

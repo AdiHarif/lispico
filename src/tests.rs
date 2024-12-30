@@ -7,7 +7,7 @@ mod tests {
     use parser::*;
 
     #[test]
-    fn test_parser() {
+    fn parser() {
         let programs = vec![
             "(a)",
             "(a b)",
@@ -35,7 +35,7 @@ mod tests {
     }
 
     #[test]
-    fn test_exp() {
+    fn exp() {
         let programs = vec![
             (
                 "(a)",
@@ -188,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_identifier() {
+    fn parse_identifier() {
         let identifiers = vec![
             "a", "aa", ".", ".<", ".>", "$", "@", "<<", ">>", "=", "_a", "a_", "a_a-a_",
         ];
@@ -210,7 +210,7 @@ mod tests {
     }
 
     #[test]
-    fn test_eval() {
+    fn eval() {
         let programs = vec![
             ("()", Exp::List(List::Nil)),
             (
@@ -256,7 +256,7 @@ mod tests {
     }
 
     #[test]
-    fn test_display() {
+    fn display() {
         let programs = vec![
             (
                 "(a)",
@@ -397,7 +397,7 @@ mod tests {
     }
 
     #[test]
-    fn test_env() {
+    fn env() {
         let cases = vec![
             ("(? a 'b 'c)", "((a x))", Exp::Identifier("b".to_string())),
             ("(? a 'b 'c)", "((b x))", Exp::Identifier("c".to_string())),

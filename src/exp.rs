@@ -24,6 +24,24 @@ impl List {
         }
     }
 
+    pub fn len(&self) -> usize {
+        match self {
+            List::Nil => 0,
+            List::Cons(_, tl) => 1 + tl.len(),
+        }
+    }
+
+    pub fn nth(&self, n: usize) -> Result<&Exp> {
+        self.slice(n)?.hd()
+    }
+
+    pub fn slice(&self, start: usize) -> Result<&List> {
+        match start {
+            0 => Ok(self),
+            _ => self.tl()?.slice(start - 1),
+        }
+    }
+
     pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
             List::Nil => Ok((Exp::List(List::Nil), env)),
@@ -100,6 +118,26 @@ mod tests {
             let res = env_lookup(identifier, &env);
             assert_eq!(res, expected, "env: {env_str}");
         }
+    }
+
+    #[test]
+    fn list_methods() -> Result<()> {
+        let list = List::Cons(
+            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(List::Cons(
+                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(List::Nil),
+            )),
+        );
+        assert_eq!(list.len(), 2);
+        assert_eq!(list.hd()?, &Exp::Identifier("a".to_string()));
+        assert_eq!(list.tl()?.hd()?, &Exp::Identifier("b".to_string()));
+        assert_eq!(list.nth(1)?, &Exp::Identifier("b".to_string()));
+        assert!(list.nth(2).is_err());
+        assert_eq!(list.slice(0)?, &list);
+        assert_eq!(list.slice(1)?.hd()?, &Exp::Identifier("b".to_string()));
+        assert_eq!(list.slice(2)?, &List::Nil);
+        Ok(())
     }
 }
 

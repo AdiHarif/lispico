@@ -249,7 +249,7 @@ mod tests {
                 .next()
                 .unwrap();
             let exp = construct_exp(pairs);
-            let (res, _) = exp.eval(List::Nil);
+            let (res, _) = exp.eval(List::Nil).unwrap();
             assert_eq!(res, expected, "program: {program}");
         }
     }
@@ -445,7 +445,7 @@ mod tests {
             } else {
                 panic!("Expected a list, but got an atom");
             }
-            let (res, _) = program.eval(env);
+            let (res, _) = program.eval(env).unwrap();
             assert_eq!(
                 res, expected,
                 "program: {program_str}, env: {env_str}, res: {res}"

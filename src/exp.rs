@@ -1,5 +1,8 @@
 use std::fmt::Display;
 
+pub type Error = Box<dyn std::error::Error>;
+pub type Result<T> = std::result::Result<T, Error>;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum List {
     Nil,
@@ -7,23 +10,23 @@ pub enum List {
 }
 
 impl List {
-    pub fn hd(&self) -> &Exp {
+    pub fn hd(&self) -> Result<&Exp> {
         match self {
-            List::Cons(car, _) => car,
-            _ => panic!("Expected a cons, but got an atom"),
+            List::Cons(hd, _) => Ok(hd),
+            List::Nil => Err("Expected a cons, but got an atom".into()),
         }
     }
 
-    pub fn tl(&self) -> &List {
+    pub fn tl(&self) -> Result<&List> {
         match self {
-            List::Cons(_, cdr) => cdr,
-            _ => panic!("Expected a cons, but got an atom"),
+            List::Cons(_, tl) => Ok(tl),
+            List::Nil => Err("Expected a cons, but got an atom".into()),
         }
     }
 
-    pub fn eval(&self, env: List) -> (Exp, List) {
+    pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
-            List::Nil => (Exp::List(List::Nil), env),
+            List::Nil => Ok((Exp::List(List::Nil), env)),
             List::Cons(hd, tl) => eval_function(hd, tl, env),
         }
     }
@@ -55,7 +58,8 @@ fn env_lookup(identifier: &str, env: &List) -> Exp {
         List::Cons(hd, tl) => match **hd {
             Exp::List(List::Cons(ref name, ref value_list)) if matches!(**name, Exp::Identifier(ref id) if id == identifier) =>
             {
-                return value_list.hd().clone();
+                debug_assert!(value_list.hd().is_ok());
+                return value_list.hd().unwrap().clone();
             }
             _ => env_lookup(identifier, tl),
         },
@@ -100,9 +104,9 @@ mod tests {
 }
 
 impl Exp {
-    pub fn eval(&self, env: List) -> (Exp, List) {
+    pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
-            Exp::Identifier(id) => (env_lookup(id, &env), env),
+            Exp::Identifier(id) => Ok((env_lookup(id, &env), env)),
             Exp::List(list) => list.eval(env),
         }
     }
@@ -121,60 +125,60 @@ impl Display for Exp {
     }
 }
 
-fn eval_function(operator: &Exp, args: &List, env: List) -> (Exp, List) {
+fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> {
     match operator {
         Exp::Identifier(identifier) => match identifier.as_str() {
             "." => {
-                let (new_hd, new_env) = args.hd().eval(env);
-                let (new_tl, new_env) = args.tl().hd().eval(new_env);
+                let (new_hd, new_env) = args.hd()?.eval(env)?;
+                let (new_tl, new_env) = args.tl()?.hd()?.eval(new_env)?;
                 if let Exp::List(list) = new_tl {
-                    return (
+                    return Ok((
                         Exp::List(List::Cons(Box::new(new_hd), Box::new(list))),
                         new_env,
-                    );
+                    ));
                 }
-                panic!("Expected a list, but got an atom");
+                return Err("Expected a list, but got an atom".into());
             }
             ".<" => {
-                let (arg, new_env) = args.hd().eval(env);
+                let (arg, new_env) = args.hd()?.eval(env)?;
                 if let Exp::List(list) = arg {
-                    return (list.hd().clone(), new_env);
+                    return Ok((list.hd()?.clone(), new_env));
                 }
-                panic!("Expected a list, but got an atom");
+                return Err("Expected a list, but got an atom".into());
             }
             ".>" => {
-                let (arg, new_env) = args.hd().eval(env);
+                let (arg, new_env) = args.hd()?.eval(env)?;
                 if let Exp::List(list) = arg {
-                    return (Exp::List(list.tl().clone()), new_env);
+                    return Ok((Exp::List(list.tl()?.clone()), new_env));
                 }
                 panic!("Expected a list, but got an atom");
             }
-            "'" => (args.hd().clone(), env),
+            "'" => Ok((args.hd()?.clone(), env)),
             "?" => {
-                let (cond, new_env) = args.hd().eval(env);
+                let (cond, new_env) = args.hd()?.eval(env)?;
                 match cond {
-                    Exp::List(List::Nil) if matches!(args.tl().tl(), List::Nil) => {
-                        (Exp::List(List::Nil), new_env)
+                    Exp::List(List::Nil) if matches!(args.tl()?.tl()?, List::Nil) => {
+                        Ok((Exp::List(List::Nil), new_env))
                     }
-                    Exp::List(List::Nil) => args.tl().tl().hd().eval(new_env),
-                    _ => args.tl().hd().eval(new_env),
+                    Exp::List(List::Nil) => args.tl()?.tl()?.hd()?.eval(new_env),
+                    _ => args.tl()?.hd()?.eval(new_env),
                 }
             }
             ":=" => {
-                let name = args.hd();
+                let name = args.hd()?;
                 if let Exp::List(_) = name {
-                    panic!("Expected an identifier, but got a list");
+                    return Err("Expected an identifier, but got a list".into());
                 }
-                let (value, new_env) = args.tl().hd().eval(env);
+                let (value, new_env) = args.tl()?.hd()?.eval(env)?;
                 let new_binding = List::Cons(
                     Box::new(Exp::Identifier(name.to_string())),
                     Box::new(List::Cons(Box::new(value), Box::new(List::Nil))),
                 );
                 let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));
-                (Exp::List(List::Nil), new_env)
+                Ok((Exp::List(List::Nil), new_env))
             }
-            _ => panic!("Unknown operator: {identifier}"),
+            _ => Err(format!("Unknown operator: {identifier}").into()),
         },
-        _ => panic!("Expected an identifier, but got a list"),
+        _ => Err("Expected an identifier, but got a list".into()),
     }
 }

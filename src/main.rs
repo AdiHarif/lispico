@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
             .unwrap();
 
         let exp = parser::construct_exp(pair);
-        let (res, new_env) = exp.eval(env);
+        let (res, new_env) = exp.eval(env).unwrap();
         env = new_env;
 
         if let Exp::List(List::Nil) = res {

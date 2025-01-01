@@ -290,10 +290,25 @@ impl Display for Exp {
 }
 
 fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> {
+    let (operator, env) = operator.eval(env)?;
+
     match operator {
+        Exp::List(list) => {
+            if list.nth(0)?.as_atom()?.as_identifier()? != "->" {
+                return Err("Expected an arrow operator".into());
+            }
+
+            let param_names = list.nth(1)?.as_list()?;
+            let inner_env = bind_params(param_names, args, env.clone())?;
+            let body = list.nth(2)?;
+
+            let (res, _) = body.eval(inner_env)?;
+
+            return Ok((res, env));
+        }
         Exp::Atom(Atom::Identifier(identifier)) => {
             for (op, func) in PREDEFINED_OPERATORS.iter() {
-                if op == identifier {
+                if *op == identifier {
                     return func(args, env);
                 }
             }
@@ -301,4 +316,23 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
         }
         _ => Err("Expected an identifier, but got a list".into()),
     }
+}
+
+fn bind_params(param_names: &List, args: &List, env: List) -> Result<List> {
+    if let List::Nil = *param_names {
+        return Ok(env);
+    }
+    debug_assert!(param_names.hd().is_ok());
+    let current_param_name = param_names.hd().unwrap().clone();
+    let (current_param_value, _) = args.hd()?.eval(env.clone())?;
+    let new_binding = List::Cons(
+        Box::new(current_param_name),
+        Box::new(List::Cons(
+            Box::new(current_param_value),
+            Box::new(List::Nil),
+        )),
+    );
+    let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(env));
+
+    bind_params(param_names.tl()?, args.tl()?, new_env)
 }

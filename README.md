@@ -44,10 +44,10 @@ a
 
 The following features are planned for Lispico:
 - Implementation:
-    - [ ] Core language features
+    - [x] Core language features
         - [x] Core pre-defined operators
         - [x] Let expressions
-        - [ ] Anonymous functions
+        - [x] Anonymous functions
     - [x] Arithmetic operations
     - [ ] String operations
     - [ ] Recursion

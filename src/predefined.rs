@@ -3,7 +3,7 @@ use crate::modules::execute_file;
 
 type LispicoOperator = fn(&List, List) -> Result<(Exp, List)>;
 
-pub static PREDEFINED_OPERATORS: [(&str, LispicoOperator); 14] = [
+pub static PREDEFINED_OPERATORS: [(&str, LispicoOperator); 15] = [
     (".", |args, env| -> Result<(Exp, List)> {
         let (new_hd, new_env) = args.hd()?.eval(env)?;
         let (new_tl, new_env) = args.tl()?.hd()?.eval(new_env)?;
@@ -70,6 +70,15 @@ pub static PREDEFINED_OPERATORS: [(&str, LispicoOperator); 14] = [
         let (res, _) = body.eval(inner_env)?;
         Ok((res, env))
     }),
+    ("->", |args, env| -> Result<(Exp, List)> {
+        Ok((
+            Exp::List(List::Cons(
+                Box::new(Exp::Atom(Atom::Identifier("->".to_string()))),
+                Box::new(args.clone()),
+            )),
+            env,
+        ))
+    }),
     ("#", |args, env| -> Result<(Exp, List)> {
         let (filename, env) = args.hd()?.eval(env)?;
         let path = filename.as_atom()?.as_string()?;
@@ -82,6 +91,21 @@ pub static PREDEFINED_OPERATORS: [(&str, LispicoOperator); 14] = [
     ("/", |args, env| eval_numeric_operator("/", args, env)),
     ("^", |args, env| eval_numeric_operator("^", args, env)),
 ];
+
+pub fn get_default_env() -> List {
+    let mut env = List::Nil;
+    for (name, _) in PREDEFINED_OPERATORS.iter() {
+        let binding = List::Cons(
+            Box::new(Exp::Atom(Atom::Identifier(name.to_string()))),
+            Box::new(List::Cons(
+                Box::new(Exp::Atom(Atom::Identifier(name.to_string()))),
+                Box::new(List::Nil),
+            )),
+        );
+        env = List::Cons(Box::new(Exp::List(binding)), Box::new(env));
+    }
+    env
+}
 
 pub fn construct_let_env(bindings: &List, env: List) -> Result<List> {
     if let List::Nil = bindings {

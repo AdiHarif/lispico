@@ -279,6 +279,26 @@ mod tests {
             ("(* 2 3)", Exp::Atom(Atom::Number(6.0))),
             ("(/ 6 2)", Exp::Atom(Atom::Number(3.0))),
             ("(^ 2 3)", Exp::Atom(Atom::Number(8.0))),
+            (
+                "
+                (
+                    (
+                        ->
+                        (x y)
+                        (. x (. y ()))
+                    )
+                    'a
+                    'b
+                )
+                ",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
         ];
 
         for (program, expected) in programs {
@@ -287,7 +307,7 @@ mod tests {
                 .next()
                 .unwrap();
             let exp = construct_exp(pairs);
-            let (res, _) = exp.eval(List::Nil).unwrap();
+            let (res, _) = exp.eval(get_default_env()).unwrap();
             assert_eq!(res, expected, "program: {program}");
         }
     }
@@ -491,7 +511,7 @@ mod tests {
             let env_exp = construct_exp(env_pair);
             let env;
             if let Exp::List(list) = env_exp {
-                env = list;
+                env = list.extend(&get_default_env());
             } else {
                 panic!("Expected a list, but got an atom");
             }

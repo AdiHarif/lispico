@@ -70,6 +70,22 @@ pub enum Exp {
     List(List),
 }
 
+impl Exp {
+    pub fn as_identifier(&self) -> Result<&str> {
+        match self {
+            Exp::Identifier(id) => Ok(id),
+            _ => Err("Expected an identifier, but got a list".into()),
+        }
+    }
+
+    pub fn as_list(&self) -> Result<&List> {
+        match self {
+            Exp::List(list) => Ok(list),
+            _ => Err("Expected a list, but got an identifier".into()),
+        }
+    }
+}
+
 fn env_lookup(identifier: &str, env: &List) -> Exp {
     match env {
         List::Nil => Exp::List(List::Nil),

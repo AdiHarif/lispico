@@ -42,6 +42,13 @@ impl List {
         }
     }
 
+    pub fn extend(&self, other: &List) -> List {
+        match self {
+            List::Nil => other.clone(),
+            List::Cons(hd, tl) => List::Cons(hd.clone(), Box::new(tl.extend(other))),
+        }
+    }
+
     pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
             List::Nil => Ok((Exp::List(List::Nil), env)),
@@ -154,6 +161,42 @@ mod tests {
         assert_eq!(list.slice(1)?.hd()?, &Exp::Identifier("b".to_string()));
         assert_eq!(list.slice(2)?, &List::Nil);
         Ok(())
+    }
+
+    #[test]
+    fn list_extend() {
+        let list1 = List::Cons(
+            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(List::Cons(
+                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(List::Nil),
+            )),
+        );
+        let list2 = List::Cons(
+            Box::new(Exp::Identifier("c".to_string())),
+            Box::new(List::Cons(
+                Box::new(Exp::Identifier("d".to_string())),
+                Box::new(List::Nil),
+            )),
+        );
+        let expected = List::Cons(
+            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(List::Cons(
+                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(List::Cons(
+                    Box::new(Exp::Identifier("c".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("d".to_string())),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            )),
+        );
+
+        assert_eq!(list1.extend(&list2), expected);
+        assert_eq!(List::Nil.extend(&list2), list2);
+        assert_eq!(list1.extend(&List::Nil), list1);
+        assert_eq!(List::Nil.extend(&List::Nil), List::Nil);
     }
 }
 

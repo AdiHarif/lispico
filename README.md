@@ -46,7 +46,7 @@ The following features are planned for Lispico:
 - Implementation:
     - [ ] Core language features
         - [x] Core pre-defined operators
-        - [ ] Let expressions
+        - [x] Let expressions
         - [ ] Anonymous functions
     - [ ] Arithmetic operations
     - [ ] String operations

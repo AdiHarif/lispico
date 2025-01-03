@@ -274,8 +274,30 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
                 let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));
                 Ok((Exp::List(List::Nil), new_env))
             }
+            "{}" => {
+                let inner_env = construct_let_env(args.nth(0)?.as_list()?, env.clone())?;
+                let body = args.nth(1)?;
+                let (res, _) = body.eval(inner_env)?;
+                Ok((res, env))
+            }
             _ => Err(format!("Unknown operator: {identifier}").into()),
         },
         _ => Err("Expected an identifier, but got a list".into()),
     }
+}
+
+pub fn construct_let_env(bindings: &List, env: List) -> Result<List> {
+    if let List::Nil = bindings {
+        return Ok(env);
+    }
+    let hd = bindings.hd()?.as_list()?;
+    let name = hd.nth(0)?;
+    let (value, new_env) = hd.nth(1)?.eval(env)?;
+    let new_binding = List::Cons(
+        Box::new(name.clone()),
+        Box::new(List::Cons(Box::new(value), Box::new(List::Nil))),
+    );
+    let next_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));
+
+    return construct_let_env(bindings.tl()?, next_env);
 }

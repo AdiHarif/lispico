@@ -241,6 +241,26 @@ mod tests {
             ("(? () 'a 'b)", Exp::Identifier("b".to_string())),
             ("(? 't 'a)", Exp::Identifier("a".to_string())),
             ("(? () 'a)", Exp::List(List::Nil)),
+            (
+                "({} ((x 'a) (y 'b)) (. x (. y ())))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
+            (
+                "({} ((x 'a) (y x)) (. x (. y ())))",
+                Exp::List(List::Cons(
+                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(List::Cons(
+                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(List::Nil),
+                    )),
+                )),
+            ),
         ];
 
         for (program, expected) in programs {

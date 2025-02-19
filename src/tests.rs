@@ -261,6 +261,13 @@ mod tests {
                     )),
                 )),
             ),
+            ("(+ 1 2)", Exp::Atom(Atom::Number(3.0))),
+            ("(+ -1 2)", Exp::Atom(Atom::Number(1.0))),
+            ("(+ 1 (+ 2 3))", Exp::Atom(Atom::Number(6.0))),
+            ("(- 2 1)", Exp::Atom(Atom::Number(1.0))),
+            ("(* 2 3)", Exp::Atom(Atom::Number(6.0))),
+            ("(/ 6 2)", Exp::Atom(Atom::Number(3.0))),
+            ("(^ 2 3)", Exp::Atom(Atom::Number(8.0))),
         ];
 
         for (program, expected) in programs {

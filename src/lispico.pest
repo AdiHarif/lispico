@@ -8,13 +8,18 @@ nil = {
     ""
 }
 
+number = @{
+      "-"? ~ ((ASCII_DIGIT)+) ~ "." ~ ((ASCII_DIGIT)+)
+    | "-"? ~ (ASCII_DIGIT)+
+}
+
 atom = _{
-    identifier
+    number | identifier
 }
 
 identifier = @{
       (ASCII_ALPHA | "_" | "-" )+
-    | ("." | "<" | ">" | "$" | "@" | "_" | "!" | "=" | "?" | ":" | "{" | "}")+
+    | ("." | "<" | ">" | "$" | "@" | "_" | "!" | "=" | "?" | ":" | "{" | "}" | "+" | "-" | "/" | "%" | "*" | "^")+
 }
 
 quote_exp = ${

@@ -6,12 +6,21 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, PartialEq, Clone)]
 pub enum Atom {
     Identifier(String),
+    Number(f64),
 }
 
 impl Atom {
     pub fn as_identifier(&self) -> Result<&str> {
         match self {
             Atom::Identifier(id) => Ok(id),
+            _ => Err("Expected an identifier".into()),
+        }
+    }
+
+    pub fn as_number(&self) -> Result<f64> {
+        match self {
+            Atom::Number(num) => Ok(*num),
+            _ => Err("Expected a number".into()),
         }
     }
 
@@ -21,6 +30,7 @@ impl Atom {
                 let res = env_lookup(identifier, &env);
                 Ok((res, env))
             }
+            Atom::Number(num) => Ok((Exp::Atom(Atom::Number(*num)), env)),
         }
     }
 }
@@ -29,6 +39,7 @@ impl Display for Atom {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Atom::Identifier(identifier) => write!(f, "{identifier}"),
+            Atom::Number(num) => write!(f, "{num}"),
         }
     }
 }
@@ -324,10 +335,35 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
                 let (res, _) = body.eval(inner_env)?;
                 Ok((res, env))
             }
+            "+" | "-" | "*" | "/" | "^" => eval_numeric_operator(identifier, args, env),
             _ => Err(format!("Unknown operator: {identifier}").into()),
         },
         _ => Err("Expected an identifier, but got a list".into()),
     }
+}
+
+fn eval_numeric_operator(op: &str, args: &List, env: List) -> Result<(Exp, List)> {
+    let (lhs, env) = args.nth(0)?.eval(env)?;
+    let (rhs, env) = args.nth(1)?.eval(env)?;
+
+    let x = lhs.as_atom()?.as_number()?;
+    let y = rhs.as_atom()?.as_number()?;
+
+    let result = match op {
+        "+" => x + y,
+        "-" => x - y,
+        "*" => x * y,
+        "/" => {
+            if y == 0.0 {
+                return Err("Division by zero".into());
+            }
+            x / y
+        }
+        "^" => x.powf(y),
+        _ => unreachable!(),
+    };
+
+    Ok((Exp::Atom(Atom::Number(result)), env))
 }
 
 pub fn construct_let_env(bindings: &List, env: List) -> Result<List> {

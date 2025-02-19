@@ -48,7 +48,7 @@ The following features are planned for Lispico:
         - [x] Core pre-defined operators
         - [x] Let expressions
         - [ ] Anonymous functions
-    - [ ] Arithmetic operations
+    - [x] Arithmetic operations
     - [ ] String operations
     - [ ] Recursion
     - [ ] Module system

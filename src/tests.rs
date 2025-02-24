@@ -40,16 +40,16 @@ mod tests {
             (
                 "(a)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Nil),
                 )),
             ),
             (
                 "(a b)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
@@ -57,11 +57,11 @@ mod tests {
             (
                 "(a b c)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                             Box::new(List::Nil),
                         )),
                     )),
@@ -79,7 +79,7 @@ mod tests {
                 "((a))",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                         Box::new(List::Nil),
                     ))),
                     Box::new(List::Nil),
@@ -88,10 +88,10 @@ mod tests {
             (
                 "(a (b))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                             Box::new(List::Nil),
                         ))),
                         Box::new(List::Nil),
@@ -101,12 +101,12 @@ mod tests {
             (
                 "(a (b c))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("c".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
@@ -118,9 +118,9 @@ mod tests {
                 "('a)",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                             Box::new(List::Nil),
                         )),
                     ))),
@@ -131,17 +131,17 @@ mod tests {
                 "('a 'b)",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                             Box::new(List::Nil),
                         )),
                     ))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
@@ -152,17 +152,17 @@ mod tests {
             (
                 "(a 'b c)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                             Box::new(List::Nil),
                         )),
                     )),
@@ -171,7 +171,7 @@ mod tests {
             (
                 "( a )",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Nil),
                 )),
             ),
@@ -215,38 +215,38 @@ mod tests {
             (
                 "(. 'a '(b))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
             ),
-            ("(.< '(a b))", Exp::Identifier("a".to_string())),
+            ("(.< '(a b))", Exp::Atom(Atom::Identifier("a".to_string()))),
             (
                 "(.> '(a b))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("b".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                     Box::new(List::Nil),
                 )),
             ),
             (
                 "(. 'a ())",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Nil),
                 )),
             ),
-            ("(? 't 'a 'b)", Exp::Identifier("a".to_string())),
-            ("(? () 'a 'b)", Exp::Identifier("b".to_string())),
-            ("(? 't 'a)", Exp::Identifier("a".to_string())),
+            ("(? 't 'a 'b)", Exp::Atom(Atom::Identifier("a".to_string()))),
+            ("(? () 'a 'b)", Exp::Atom(Atom::Identifier("b".to_string()))),
+            ("(? 't 'a)", Exp::Atom(Atom::Identifier("a".to_string()))),
             ("(? () 'a)", Exp::List(List::Nil)),
             (
                 "({} ((x 'a) (y 'b)) (. x (. y ())))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
@@ -254,9 +254,9 @@ mod tests {
             (
                 "({} ((x 'a) (y x)) (. x (. y ())))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
@@ -280,16 +280,16 @@ mod tests {
             (
                 "(a)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Nil),
                 )),
             ),
             (
                 "(a b)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
@@ -297,11 +297,11 @@ mod tests {
             (
                 "(a b c)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("b".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                             Box::new(List::Nil),
                         )),
                     )),
@@ -319,7 +319,7 @@ mod tests {
                 "((a))",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("a".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                         Box::new(List::Nil),
                     ))),
                     Box::new(List::Nil),
@@ -328,10 +328,10 @@ mod tests {
             (
                 "(a (b))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                             Box::new(List::Nil),
                         ))),
                         Box::new(List::Nil),
@@ -341,12 +341,12 @@ mod tests {
             (
                 "(a (b c))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("b".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("c".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
@@ -358,9 +358,9 @@ mod tests {
                 "('a)",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                             Box::new(List::Nil),
                         )),
                     ))),
@@ -371,17 +371,17 @@ mod tests {
                 "('a 'b)",
                 Exp::List(List::Cons(
                     Box::new(Exp::List(List::Cons(
-                        Box::new(Exp::Identifier("'".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("a".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                             Box::new(List::Nil),
                         )),
                     ))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
@@ -392,17 +392,17 @@ mod tests {
             (
                 "(a 'b c)",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("a".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
                     Box::new(List::Cons(
                         Box::new(Exp::List(List::Cons(
-                            Box::new(Exp::Identifier("'".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),
                             Box::new(List::Cons(
-                                Box::new(Exp::Identifier("b".to_string())),
+                                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                                 Box::new(List::Nil),
                             )),
                         ))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("c".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                             Box::new(List::Nil),
                         )),
                     )),
@@ -418,30 +418,42 @@ mod tests {
     #[test]
     fn env() {
         let cases = vec![
-            ("(? a 'b 'c)", "((a x))", Exp::Identifier("b".to_string())),
-            ("(? a 'b 'c)", "((b x))", Exp::Identifier("c".to_string())),
+            (
+                "(? a 'b 'c)",
+                "((a x))",
+                Exp::Atom(Atom::Identifier("b".to_string())),
+            ),
+            (
+                "(? a 'b 'c)",
+                "((b x))",
+                Exp::Atom(Atom::Identifier("c".to_string())),
+            ),
             (
                 "(. a b)",
                 "((a x) (b (y z)))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("x".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("x".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("y".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("y".to_string()))),
                         Box::new(List::Cons(
-                            Box::new(Exp::Identifier("z".to_string())),
+                            Box::new(Exp::Atom(Atom::Identifier("z".to_string()))),
                             Box::new(List::Nil),
                         )),
                     )),
                 )),
             ),
-            ("(.< a)", "((a (x y z)))", Exp::Identifier("x".to_string())),
+            (
+                "(.< a)",
+                "((a (x y z)))",
+                Exp::Atom(Atom::Identifier("x".to_string())),
+            ),
             (
                 "(.> a)",
                 "((a (x y z)))",
                 Exp::List(List::Cons(
-                    Box::new(Exp::Identifier("y".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("y".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("z".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("z".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),

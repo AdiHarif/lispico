@@ -4,6 +4,36 @@ pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, PartialEq, Clone)]
+pub enum Atom {
+    Identifier(String),
+}
+
+impl Atom {
+    pub fn as_identifier(&self) -> Result<&str> {
+        match self {
+            Atom::Identifier(id) => Ok(id),
+        }
+    }
+
+    pub fn eval(&self, env: List) -> Result<(Exp, List)> {
+        match self {
+            Atom::Identifier(identifier) => {
+                let res = env_lookup(identifier, &env);
+                Ok((res, env))
+            }
+        }
+    }
+}
+
+impl Display for Atom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Atom::Identifier(identifier) => write!(f, "{identifier}"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum List {
     Nil,
     Cons(Box<Exp>, Box<List>),
@@ -73,14 +103,14 @@ impl Display for List {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Exp {
-    Identifier(String),
+    Atom(Atom),
     List(List),
 }
 
 impl Exp {
-    pub fn as_identifier(&self) -> Result<&str> {
+    pub fn as_atom(&self) -> Result<&Atom> {
         match self {
-            Exp::Identifier(id) => Ok(id),
+            Exp::Atom(atom) => Ok(atom),
             _ => Err("Expected an identifier, but got a list".into()),
         }
     }
@@ -97,7 +127,7 @@ fn env_lookup(identifier: &str, env: &List) -> Exp {
     match env {
         List::Nil => Exp::List(List::Nil),
         List::Cons(hd, tl) => match **hd {
-            Exp::List(List::Cons(ref name, ref value_list)) if matches!(**name, Exp::Identifier(ref id) if id == identifier) =>
+            Exp::List(List::Cons(ref name, ref value_list)) if matches!(**name, Exp::Atom(Atom::Identifier(ref id)) if id == identifier) =>
             {
                 debug_assert!(value_list.hd().is_ok());
                 return value_list.hd().unwrap().clone();
@@ -119,9 +149,17 @@ mod tests {
     fn lookup() {
         let envs = vec![
             ("()", "a", Exp::List(List::Nil)),
-            ("((a x))", "a", Exp::Identifier("x".to_string())),
-            ("((a x) (b y))", "a", Exp::Identifier("x".to_string())),
-            ("((a x) (b y))", "b", Exp::Identifier("y".to_string())),
+            ("((a x))", "a", Exp::Atom(Atom::Identifier("x".to_string()))),
+            (
+                "((a x) (b y))",
+                "a",
+                Exp::Atom(Atom::Identifier("x".to_string())),
+            ),
+            (
+                "((a x) (b y))",
+                "b",
+                Exp::Atom(Atom::Identifier("y".to_string())),
+            ),
             ("((a x) (b y))", "", Exp::List(List::Nil)),
         ];
 
@@ -146,19 +184,25 @@ mod tests {
     #[test]
     fn list_methods() -> Result<()> {
         let list = List::Cons(
-            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
             Box::new(List::Cons(
-                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                 Box::new(List::Nil),
             )),
         );
         assert_eq!(list.len(), 2);
-        assert_eq!(list.hd()?, &Exp::Identifier("a".to_string()));
-        assert_eq!(list.tl()?.hd()?, &Exp::Identifier("b".to_string()));
-        assert_eq!(list.nth(1)?, &Exp::Identifier("b".to_string()));
+        assert_eq!(list.hd()?, &Exp::Atom(Atom::Identifier("a".to_string())));
+        assert_eq!(
+            list.tl()?.hd()?,
+            &Exp::Atom(Atom::Identifier("b".to_string()))
+        );
+        assert_eq!(list.nth(1)?, &Exp::Atom(Atom::Identifier("b".to_string())));
         assert!(list.nth(2).is_err());
         assert_eq!(list.slice(0)?, &list);
-        assert_eq!(list.slice(1)?.hd()?, &Exp::Identifier("b".to_string()));
+        assert_eq!(
+            list.slice(1)?.hd()?,
+            &Exp::Atom(Atom::Identifier("b".to_string()))
+        );
         assert_eq!(list.slice(2)?, &List::Nil);
         Ok(())
     }
@@ -166,27 +210,27 @@ mod tests {
     #[test]
     fn list_extend() {
         let list1 = List::Cons(
-            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
             Box::new(List::Cons(
-                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                 Box::new(List::Nil),
             )),
         );
         let list2 = List::Cons(
-            Box::new(Exp::Identifier("c".to_string())),
+            Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
             Box::new(List::Cons(
-                Box::new(Exp::Identifier("d".to_string())),
+                Box::new(Exp::Atom(Atom::Identifier("d".to_string()))),
                 Box::new(List::Nil),
             )),
         );
         let expected = List::Cons(
-            Box::new(Exp::Identifier("a".to_string())),
+            Box::new(Exp::Atom(Atom::Identifier("a".to_string()))),
             Box::new(List::Cons(
-                Box::new(Exp::Identifier("b".to_string())),
+                Box::new(Exp::Atom(Atom::Identifier("b".to_string()))),
                 Box::new(List::Cons(
-                    Box::new(Exp::Identifier("c".to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier("c".to_string()))),
                     Box::new(List::Cons(
-                        Box::new(Exp::Identifier("d".to_string())),
+                        Box::new(Exp::Atom(Atom::Identifier("d".to_string()))),
                         Box::new(List::Nil),
                     )),
                 )),
@@ -203,7 +247,7 @@ mod tests {
 impl Exp {
     pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
-            Exp::Identifier(id) => Ok((env_lookup(id, &env), env)),
+            Exp::Atom(atom) => atom.eval(env),
             Exp::List(list) => list.eval(env),
         }
     }
@@ -212,8 +256,8 @@ impl Exp {
 impl Display for Exp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Exp::Identifier(identifier) => write!(f, "{identifier}"),
-            Exp::List(List::Cons(hd, tl)) if matches!(**hd, Exp::Identifier(ref id) if id == "'") =>
+            Exp::Atom(atom) => write!(f, "{atom}"),
+            Exp::List(List::Cons(hd, tl)) if matches!(**hd, Exp::Atom(Atom::Identifier(ref id)) if id == "'") =>
             {
                 write!(f, "'{tl}")
             }
@@ -224,7 +268,7 @@ impl Display for Exp {
 
 fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> {
     match operator {
-        Exp::Identifier(identifier) => match identifier.as_str() {
+        Exp::Atom(Atom::Identifier(identifier)) => match identifier.as_str() {
             "." => {
                 let (new_hd, new_env) = args.hd()?.eval(env)?;
                 let (new_tl, new_env) = args.tl()?.hd()?.eval(new_env)?;
@@ -268,7 +312,7 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
                 }
                 let (value, new_env) = args.tl()?.hd()?.eval(env)?;
                 let new_binding = List::Cons(
-                    Box::new(Exp::Identifier(name.to_string())),
+                    Box::new(Exp::Atom(Atom::Identifier(name.to_string()))),
                     Box::new(List::Cons(Box::new(value), Box::new(List::Nil))),
                 );
                 let new_env = List::Cons(Box::new(Exp::List(new_binding)), Box::new(new_env));

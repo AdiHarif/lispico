@@ -306,6 +306,16 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
                 panic!("Expected a list, but got an atom");
             }
             "'" => Ok((args.hd()?.clone(), env)),
+            "=" => {
+                let (lhs, env) = args.nth(0)?.eval(env)?;
+                let (rhs, env) = args.nth(1)?.eval(env)?;
+
+                if (lhs != rhs) {
+                    return Ok((Exp::List(List::Nil), env));
+                } else {
+                    return Ok((Exp::Atom(Atom::Identifier("t".to_string())), env));
+                }
+            }
             "?" => {
                 let (cond, new_env) = args.hd()?.eval(env)?;
                 match cond {

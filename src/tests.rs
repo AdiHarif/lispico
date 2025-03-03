@@ -23,12 +23,14 @@ mod tests {
             "( a )",
             "(? 't 'a 'b)",
             "(? 't 'a)",
+            "\"abc\"",
+            "(:= x \"abc\")",
         ];
         for program in programs {
             assert!(LispicoParser::parse(Rule::program, program).is_ok());
         }
 
-        let faulty_programs = vec!["(", ")", "(a", "a)", "(a b", "(a b c", "(' a)"];
+        let faulty_programs = vec!["(", ")", "(a", "a)", "(a b", "(a b c", "(' a)", "\"adfg"];
         for program in faulty_programs {
             assert!(LispicoParser::parse(Rule::program, program).is_err());
         }

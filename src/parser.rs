@@ -26,6 +26,7 @@ pub fn construct_exp(pair: Pair<Rule>) -> Exp {
         Rule::nil => Exp::List(List::Nil),
         Rule::identifier => Exp::Atom(Atom::Identifier(pair.as_str().to_string())),
         Rule::number => Exp::Atom(Atom::Number(pair.as_str().parse().unwrap())),
+        Rule::string => Exp::Atom(Atom::String(pair.as_str().to_string())),
         Rule::list => Exp::List(construct_list(pair)),
         Rule::quote_exp => Exp::List(List::Cons(
             Box::new(Exp::Atom(Atom::Identifier("'".to_string()))),

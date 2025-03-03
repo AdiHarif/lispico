@@ -3,9 +3,18 @@ WHITESPACE = _{ " " | "\n" | "\t" | "," }
 
 rparen = _{ "(" }
 lparen = _{ ")" }
+double_quote = _{ "\"" }
 
 nil = {
     ""
+}
+
+string = @{
+    (!"\"" ~ ANY)*
+}
+
+quoted_string = _{
+    double_quote ~ string  ~ double_quote
 }
 
 number = @{
@@ -14,7 +23,7 @@ number = @{
 }
 
 atom = _{
-    number | identifier
+    quoted_string | number | identifier
 }
 
 identifier = @{

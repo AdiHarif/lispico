@@ -7,6 +7,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Atom {
     Identifier(String),
     Number(f64),
+    String(String),
 }
 
 impl Atom {
@@ -24,6 +25,13 @@ impl Atom {
         }
     }
 
+    pub fn as_string(&self) -> Result<&str> {
+        match self {
+            Atom::String(s) => Ok(s),
+            _ => Err("Expected a string".into()),
+        }
+    }
+
     pub fn eval(&self, env: List) -> Result<(Exp, List)> {
         match self {
             Atom::Identifier(identifier) => {
@@ -31,6 +39,7 @@ impl Atom {
                 Ok((res, env))
             }
             Atom::Number(num) => Ok((Exp::Atom(Atom::Number(*num)), env)),
+            Atom::String(s) => Ok((Exp::Atom(Atom::String(s.to_string())), env)),
         }
     }
 }
@@ -40,6 +49,7 @@ impl Display for Atom {
         match self {
             Atom::Identifier(identifier) => write!(f, "{identifier}"),
             Atom::Number(num) => write!(f, "{num}"),
+            Atom::String(s) => write!(f, "\"{s}\""),
         }
     }
 }

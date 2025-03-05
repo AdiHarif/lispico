@@ -1,42 +1,26 @@
-use std::io::{self, Write};
-
-use parser::LispicoParser;
-use pest::Parser;
+use std::env;
+use std::io;
 
 mod exp;
+mod modules;
 mod parser;
 mod tests;
 
-use exp::{Exp, List};
+use exp::List;
 
 fn main() -> io::Result<()> {
-    let mut env = List::Nil;
-    loop {
-        print!("$ ");
-        io::stdout().flush().unwrap();
+    let args: Vec<String> = env::args().collect();
 
-        let mut input = String::new();
-        if io::stdin().read_line(&mut input)? == 0 {
-            return Ok(());
-        }
-
-        input = input.trim().to_string();
-        if input.is_empty() {
-            continue;
-        }
-
-        let pair = LispicoParser::parse(parser::Rule::program, &input)
-            .expect("failed to parse input")
-            .next()
-            .unwrap();
-
-        let exp = parser::construct_exp(pair);
-        let (res, new_env) = exp.eval(env).unwrap();
-        env = new_env;
-
-        if let Exp::List(List::Nil) = res {
-            continue;
-        }
-        println!("{res}");
+    if args.len() > 2 {
+        println!("Error - Too many arguments");
+        println!("Usage: lispico [file]");
+    } else if args.len() == 2 {
+        let path = &args[1];
+        modules::execute_file(path, List::Nil).expect("failed to execute file");
+    } else {
+        modules::execute_stream(io::stdin().lock(), List::Nil, true)
+            .expect("failed to execute stream");
     }
+
+    return Ok(());
 }

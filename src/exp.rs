@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use crate::modules::execute_file;
+
 pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -354,6 +356,12 @@ fn eval_function(operator: &Exp, args: &List, env: List) -> Result<(Exp, List)> 
                 let body = args.nth(1)?;
                 let (res, _) = body.eval(inner_env)?;
                 Ok((res, env))
+            }
+            "#" => {
+                let (filename, env) = args.hd()?.eval(env)?;
+                let path = filename.as_atom()?.as_string()?;
+                let new_env = execute_file(path, env)?;
+                Ok((Exp::List(List::Nil), new_env))
             }
             "+" | "-" | "*" | "/" | "^" => eval_numeric_operator(identifier, args, env),
             _ => Err(format!("Unknown operator: {identifier}").into()),

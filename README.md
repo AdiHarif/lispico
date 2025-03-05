@@ -51,7 +51,7 @@ The following features are planned for Lispico:
     - [x] Arithmetic operations
     - [ ] String operations
     - [ ] Recursion
-    - [ ] Module system
+    - [x] Module system
     - [ ] Standard library
     - [ ] CLI improvements
 - Documentation

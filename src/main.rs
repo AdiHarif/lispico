@@ -4,6 +4,7 @@ use std::io;
 mod exp;
 mod modules;
 mod parser;
+mod predefined;
 mod tests;
 
 use exp::List;
